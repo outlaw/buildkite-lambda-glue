@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+curl https://raw.githubusercontent.com/apex/apex/master/install.sh | sh
+wget https://github.com/outlaw/roo/releases/download/0.0.0-alpha/roo-linux-x86_64.tar.gz
+tar xvf roo-linux-x86_64.tar.gz
+#wget https://github.com/outlaw/roo/releases/download/0.0.0-alpha/roo-darwin-x86_64.tar.gz
+#tar xvf roo-darwin-x86_64.tar.gz
+
+export AWS_PROFILE=nonprod
+export AWS_REGION=ap-southeast-2
+export ENVIRONMENT=staging
+
+# Environment variables
+BUILDKITE_API_USER=$(./roo env get -a buildkite-lambda-glue -e $ENVIRONMENT BUILDKITE_API_USER)
+BUILDKITE_API_TOKEN=$(./roo env get -a buildkite-lambda-glue -e $ENVIRONMENT BUILDKITE_API_TOKEN)
+
+export AWS_REGION=us-east-1
+
+# Deploy to apex
+apex deploy -e BUILDKITE_API_USER=$BUILDKITE_API_USER -e BUILDKITE_API_TOKEN=$BUILDKITE_API_TOKEN
